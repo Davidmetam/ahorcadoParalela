@@ -1,3 +1,5 @@
+package org.example.servidor;
+
 import java.util.*;
 
 public class JuegoAhorcado {
