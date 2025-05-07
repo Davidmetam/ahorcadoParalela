@@ -9,6 +9,7 @@ public class ClienteAhorcado {
             JFrame ventana = new JFrame("Ahorcado Cliente");
             ventana.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
             ventana.setSize(500, 600);
+            ventana.setResizable(false);
             ventana.setLayout(new BorderLayout());
 
             // Paneles
