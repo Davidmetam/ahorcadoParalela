@@ -26,4 +26,7 @@ public class TecladoPanel extends JPanel {
         letra = Character.toUpperCase(letra);
         botones[letra - 'A'].setEnabled(false);
     }
+
+    public void activarTecladoDisponible() {
+    }
 }

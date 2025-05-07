@@ -7,6 +7,7 @@ import java.net.Socket;
 import java.util.*;
 
 public class ServidorAhorcado {
+    private static int contadorClientes = 0;
     public static final int PUERTO = 5000;
     private static JuegoAhorcado juegoCompartido = new JuegoAhorcado();
     private static final List<PrintWriter> clientes = Collections.synchronizedList(new ArrayList<>());
@@ -18,9 +19,15 @@ public class ServidorAhorcado {
         try (ServerSocket servidor = new ServerSocket(PUERTO)) {
             while (true) {
                 Socket cliente = servidor.accept();
-                System.out.println("Cliente conectado: " + cliente.getInetAddress());
+                PrintWriter out = new PrintWriter(cliente.getOutputStream(), true);
+                int id = contadorClientes++;
 
-                new Thread(new ManejadorCliente(cliente, juegoCompartido, clientes)).start();
+                new Thread(new ManejadorCliente(cliente, juegoCompartido, clientes, id)).start();
+                if (clientes.size() == 1) {
+                    out.println("TURNO:0");
+                }
+
+
             }
         } catch (IOException e) {
             e.printStackTrace();
@@ -32,9 +39,15 @@ public class ServidorAhorcado {
         return clientes.indexOf(out) == turnoActual;
     }
 
+
     public static synchronized void avanzarTurno() {
         if (!clientes.isEmpty()) {
             turnoActual = (turnoActual + 1) % clientes.size();
+
+            for (int i = 0; i < clientes.size(); i++) {
+                clientes.get(i).println("TURNO:" + turnoActual);
+            }
         }
     }
+
 }

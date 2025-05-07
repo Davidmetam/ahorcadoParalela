@@ -12,21 +12,25 @@ public class ManejadorCliente implements Runnable {
     private JuegoAhorcado juego;
     private List<PrintWriter> clientes;
     private PrintWriter out;
+    private int idCliente;
 
-    public ManejadorCliente(Socket socket, JuegoAhorcado juego, List<PrintWriter> clientes) {
+    public ManejadorCliente(Socket socket, JuegoAhorcado juego, List<PrintWriter> clientes, int idCliente) {
         this.socket = socket;
         this.juego = juego;
         this.clientes = clientes;
+        this.idCliente = idCliente;
     }
 
     @Override
     public void run() {
-        try (
-                BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-        ) {
+        try {
+            BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
             out = new PrintWriter(socket.getOutputStream(), true);
-            clientes.add(out);
 
+            out.println("ID:" + idCliente); // ✅ Esto debe ser LO PRIMERO
+            clientes.add(out);              // ✅ Luego se añade el cliente
+
+            // Luego envías el estado inicial del juego
             out.println(juego.getEstadoPalabra());
             out.println(juego.getErroresRestantes());
 
@@ -40,26 +44,29 @@ public class ManejadorCliente implements Runnable {
                 char letra = entrada.toUpperCase().charAt(0);
                 synchronized (juego) {
                     boolean acierto = juego.intentar(letra);
-
-                    for (PrintWriter cliente : clientes) {
-                        cliente.println(acierto ? "CORRECTO" : "INCORRECTO");
-                        cliente.println(juego.getEstadoPalabra());
-                        cliente.println(juego.getErroresRestantes());
+                    synchronized (clientes) {
+                        for (PrintWriter cliente : clientes) {
+                            cliente.println(acierto ? "CORRECTO" : "INCORRECTO");
+                            cliente.println(juego.getEstadoPalabra());
+                            cliente.println(juego.getErroresRestantes());
+                        }
                     }
-
                     if (juego.estaGanado()) {
-                        for (PrintWriter cliente : clientes) {
-                            cliente.println("GANASTE");
+                        synchronized (clientes) {
+                            for (PrintWriter cliente : clientes) {
+                                cliente.println("GANASTE");
+                            }
                         }
                         break;
                     }
-
-                    if (juego.estaPerdido()) {
-                        for (PrintWriter cliente : clientes) {
-                            cliente.println("PERDISTE");
-                            cliente.println("LA PALABRA ERA: " + juego.getPalabra());
+                    synchronized (clientes) {
+                        if (juego.estaPerdido()) {
+                            for (PrintWriter cliente : clientes) {
+                                cliente.println("PERDISTE");
+                                cliente.println("LA PALABRA ERA: " + juego.getPalabra());
+                            }
+                            break;
                         }
-                        break;
                     }
 
                     ServidorAhorcado.avanzarTurno();
@@ -70,4 +77,5 @@ public class ManejadorCliente implements Runnable {
             System.out.println("Error con cliente: " + e.getMessage());
         }
     }
+
 }

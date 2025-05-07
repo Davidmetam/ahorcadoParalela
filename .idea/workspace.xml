@@ -4,11 +4,12 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="d5ee735f-391c-4f64-873c-8a746acd12d7" name="Changes" comment="add files">
-      <change beforePath="$PROJECT_DIR$/src/main/java/org/example/cliente/ClienteAhorcado.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/example/cliente/ClienteAhorcado.java" afterDir="false" />
+    <list default="true" id="d5ee735f-391c-4f64-873c-8a746acd12d7" name="Changes" comment="package setting">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/org/example/cliente/ControladorCliente.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/example/cliente/ControladorCliente.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/org/example/cliente/PanelAhorcado.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/example/cliente/PanelAhorcado.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/org/example/cliente/TecladoPanel.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/example/cliente/TecladoPanel.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/org/example/servidor/ManejadorCliente.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/example/servidor/ManejadorCliente.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/org/example/servidor/ServidorAhorcado.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/example/servidor/ServidorAhorcado.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -40,6 +41,7 @@
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "git-widget-placeholder": "ajustesServidor",
     "kotlin-language-version-configured": "true",
+    "node.js.selected.package.tslint": "(autodetect)",
     "nodejs_package_manager_path": "npm",
     "vue.rearranger.settings.migration": "true"
   }
@@ -116,7 +118,15 @@
       <option name="project" value="LOCAL" />
       <updated>1746594627366</updated>
     </task>
-    <option name="localTasksCounter" value="3" />
+    <task id="LOCAL-00003" summary="package setting">
+      <option name="closed" value="true" />
+      <created>1746598619224</created>
+      <option name="number" value="00003" />
+      <option name="presentableId" value="LOCAL-00003" />
+      <option name="project" value="LOCAL" />
+      <updated>1746598619224</updated>
+    </task>
+    <option name="localTasksCounter" value="4" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -125,6 +135,7 @@
   <component name="VcsManagerConfiguration">
     <MESSAGE value="first commit" />
     <MESSAGE value="add files" />
-    <option name="LAST_COMMIT_MESSAGE" value="add files" />
+    <MESSAGE value="package setting" />
+    <option name="LAST_COMMIT_MESSAGE" value="package setting" />
   </component>
 </project>
