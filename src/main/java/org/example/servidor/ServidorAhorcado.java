@@ -14,25 +14,21 @@ public class ServidorAhorcado {
     public static final int PUERTO = 5000;
     public static final JuegoAhorcado juegoCompartido = new JuegoAhorcado();
 
-    // Mapa para almacenar la conexión y el nombre de cada jugador
     public static final Map<String, PrintWriter> jugadores = new ConcurrentHashMap<>();
 
-    // Control de estado del juego
     public static final AtomicBoolean juegoIniciado = new AtomicBoolean(false);
     public static final AtomicInteger turnoActual = new AtomicInteger(0);
 
-    // Lista para mantener el orden de los jugadores
     public static final List<String> ordenJugadores = Collections.synchronizedList(new ArrayList<>());
 
-    // Conjunto para almacenar letras ya utilizadas
     public static final Set<Character> letrasUsadas = Collections.synchronizedSet(new HashSet<>());
 
     public static void main(String[] args) {
         System.out.println("Servidor del Ahorcado iniciado en el puerto " + PUERTO);
         System.out.println("Esperando jugadores...");
         System.out.println("Escribe 'start' para iniciar el juego cuando todos los jugadores estén conectados.");
+        System.out.println("Escribe 'restart' para reiniciar el juego.");
 
-        // Hilo para escuchar comandos de consola del servidor
         new Thread(() -> {
             Scanner scanner = new Scanner(System.in);
             while (true) {
@@ -63,7 +59,6 @@ public class ServidorAhorcado {
             return;
         }
 
-        // Reiniciar estado del juego
         juegoIniciado.set(true);
         turnoActual.set(0);
         letrasUsadas.clear();
@@ -71,38 +66,35 @@ public class ServidorAhorcado {
         System.out.println("¡Juego iniciado con " + jugadores.size() + " jugadores!");
         System.out.println("La palabra a adivinar es: " + juegoCompartido.getPalabra());
 
-        // Notificar a todos que el juego ha iniciado
-        broadcastEstadoJuego();
+        broadcast("PALABRA:" + juegoCompartido.getEstadoPalabra());
+        broadcast("ERRORES:" + juegoCompartido.getErroresRestantes());
 
-        // Dar el primer turno
         asignarSiguienteTurno();
     }
 
     public static void reiniciarJuego() {
-        if (juegoIniciado.get()) {
-            broadcast("JUEGO_REINICIADO");
-        }
+        broadcast("JUEGO_REINICIADO");
 
-        // Crear un nuevo juego
         JuegoAhorcado nuevoJuego = new JuegoAhorcado();
-        // Reemplazar el juego compartido con uno nuevo
+
         juegoCompartido.setPalabra(nuevoJuego.getPalabra());
         juegoCompartido.resetear();
 
         System.out.println("Juego reiniciado. Nueva palabra: " + juegoCompartido.getPalabra());
 
-        // Reiniciar letras usadas
         letrasUsadas.clear();
 
-        // Iniciar el juego con los jugadores conectados
-        iniciarJuego();
+        juegoIniciado.set(true);
+        turnoActual.set(0);
+
+        broadcastEstadoJuego();
+
+        asignarSiguienteTurno();
     }
 
     public static void broadcastEstadoJuego() {
-        for (PrintWriter out : jugadores.values()) {
-            out.println("PALABRA:" + juegoCompartido.getEstadoPalabra());
-            out.println("ERRORES:" + juegoCompartido.getErroresRestantes());
-        }
+        broadcast("PALABRA:" + juegoCompartido.getEstadoPalabra());
+        broadcast("ERRORES:" + juegoCompartido.getErroresRestantes());
     }
 
     public static void asignarSiguienteTurno() {
@@ -113,7 +105,6 @@ public class ServidorAhorcado {
 
         System.out.println("Turno asignado a: " + jugadorTurno);
 
-        // Notificar a todos de quién es el turno
         for (Map.Entry<String, PrintWriter> entry : jugadores.entrySet()) {
             String nombre = entry.getKey();
             PrintWriter out = entry.getValue();
@@ -127,6 +118,7 @@ public class ServidorAhorcado {
     }
 
     public static void broadcast(String mensaje) {
+        System.out.println("Enviando a todos los clientes: " + mensaje);
         for (PrintWriter out : jugadores.values()) {
             out.println(mensaje);
         }

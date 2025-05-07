@@ -19,14 +19,11 @@ public class ControladorCliente {
             in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
             out = new PrintWriter(socket.getOutputStream(), true);
 
-            // Enviar nombre al servidor
             out.println(nombreUsuario);
             estadoLabel.setText("Conectado como: " + nombreUsuario);
 
-            // Inicialmente desactivar el teclado hasta recibir turno
             desactivarTeclado(teclado);
 
-            // Hilo para escuchar mensajes del servidor
             new Thread(() -> {
                 try {
                     while (true) {
@@ -48,13 +45,11 @@ public class ControladorCliente {
                 }
             }).start();
 
-            // Configurar acción de teclado
             teclado.setListener(e -> {
                 if (miTurno) {
                     JButton btn = (JButton) e.getSource();
                     char letra = btn.getText().charAt(0);
                     out.println(letra);
-                    // La desactivación de letras ahora viene del servidor para todos los clientes
                     miTurno = false;
                     turnoLabel.setText("Esperando tu turno...");
                 }
@@ -68,7 +63,7 @@ public class ControladorCliente {
 
     private void procesarMensaje(String mensaje, PanelAhorcado panel, JLabel palabraLabel,
                                  JLabel estadoLabel, JLabel turnoLabel, TecladoPanel teclado) {
-        if (mensaje == null) return; // Protección contra NPE
+        if (mensaje == null) return;
 
         switch (mensaje) {
             case "ESPERAR_INICIO":
@@ -82,12 +77,14 @@ public class ControladorCliente {
                 break;
 
             case "GANASTE":
+                miTurno = false;
                 turnoLabel.setText("¡El juego ha terminado!");
                 estadoLabel.setText("¡Han ganado! La palabra ha sido adivinada");
                 desactivarTeclado(teclado);
                 break;
 
             case "PERDISTE":
+                miTurno = false;
                 turnoLabel.setText("¡El juego ha terminado!");
                 estadoLabel.setText("¡Han perdido! Se agotaron los intentos");
                 desactivarTeclado(teclado);
@@ -100,6 +97,13 @@ public class ControladorCliente {
                 } catch (IOException e) {
                     estadoLabel.setText("Error recibiendo palabra completa");
                 }
+                break;
+
+            case "JUEGO_REINICIADO":
+                estadoLabel.setText("El juego ha sido reiniciado");
+                resetearTeclado(teclado);
+                panel.setErrores(0);
+                miTurno = false;
                 break;
 
             default:
@@ -115,18 +119,22 @@ public class ControladorCliente {
                 } else if (mensaje.startsWith("ERRORES:")) {
                     try {
                         int restantes = Integer.parseInt(mensaje.substring(8));
-                        panel.setErrores(5 - restantes);
+                        int errores = 5 - restantes;
+                        System.out.println("Actualizando errores a: " + errores);
+                        panel.setErrores(errores);
                     } catch (NumberFormatException e) {
                         System.err.println("Error al parsear errores: " + mensaje);
-                        // Si hay error, asumimos que se perdió
                         panel.setErrores(5);
                     }
                 } else if (mensaje.startsWith("ESTADO:")) {
                     String estado = mensaje.substring(7);
-                    // Solo actualizamos el estado, no cambiamos el mensaje de turno
                 } else if (mensaje.startsWith("LETRA_USADA:")) {
-                    char letra = mensaje.charAt(11);
-                    teclado.desactivarLetra(letra);
+                    if (mensaje.length() > 11) {
+                        char letra = mensaje.charAt(11);
+                        teclado.desactivarLetra(letra);
+                    } else {
+                        System.err.println("Mensaje LETRA_USADA inválido: " + mensaje);
+                    }
                 }
                 break;
         }
@@ -134,5 +142,9 @@ public class ControladorCliente {
 
     private void desactivarTeclado(TecladoPanel teclado) {
         miTurno = false;
+    }
+
+    private void resetearTeclado(TecladoPanel teclado) {
+        teclado.resetearTeclado();
     }
 }

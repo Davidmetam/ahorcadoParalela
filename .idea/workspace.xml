@@ -4,11 +4,11 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="d5ee735f-391c-4f64-873c-8a746acd12d7" name="Changes" comment="add files">
+    <list default="true" id="d5ee735f-391c-4f64-873c-8a746acd12d7" name="Changes" comment="server adjustment">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/org/example/cliente/ClienteAhorcado.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/example/cliente/ClienteAhorcado.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/org/example/cliente/ControladorCliente.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/example/cliente/ControladorCliente.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/org/example/servidor/ServidorAhorcado.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/example/servidor/ServidorAhorcado.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/org/example/cliente/TecladoPanel.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/example/cliente/TecladoPanel.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -157,7 +157,15 @@
       <option name="project" value="LOCAL" />
       <updated>1746623655267</updated>
     </task>
-    <option name="localTasksCounter" value="6" />
+    <task id="LOCAL-00006" summary="server adjustment">
+      <option name="closed" value="true" />
+      <created>1746625764288</created>
+      <option name="number" value="00006" />
+      <option name="presentableId" value="LOCAL-00006" />
+      <option name="project" value="LOCAL" />
+      <updated>1746625764288</updated>
+    </task>
+    <option name="localTasksCounter" value="7" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -167,6 +175,7 @@
     <MESSAGE value="first commit" />
     <MESSAGE value="package setting" />
     <MESSAGE value="add files" />
-    <option name="LAST_COMMIT_MESSAGE" value="add files" />
+    <MESSAGE value="server adjustment" />
+    <option name="LAST_COMMIT_MESSAGE" value="server adjustment" />
   </component>
 </project>

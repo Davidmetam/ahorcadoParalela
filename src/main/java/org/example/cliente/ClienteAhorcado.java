@@ -6,7 +6,19 @@ import java.awt.*;
 public class ClienteAhorcado {
     public static void main(String[] args) {
         SwingUtilities.invokeLater(() -> {
-            JFrame ventana = new JFrame("Ahorcado Cliente");
+
+            String nombreUsuario = JOptionPane.showInputDialog(null,
+                    "Introduce tu nombre de jugador:",
+                    "Juego del Ahorcado",
+                    JOptionPane.QUESTION_MESSAGE);
+
+            if (nombreUsuario == null || nombreUsuario.trim().isEmpty()) {
+                nombreUsuario = "Jugador" + (int)(Math.random() * 1000);
+            }
+
+            final String nombreFinal = nombreUsuario;
+
+            JFrame ventana = new JFrame("Ahorcado Cliente - " + nombreFinal);
             ventana.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
             ventana.setSize(500, 600);
             ventana.setResizable(false);
@@ -15,10 +27,12 @@ public class ClienteAhorcado {
             PanelAhorcado panelDibujo = new PanelAhorcado();
             JLabel palabraLabel = new JLabel("Palabra: ");
             JLabel estadoLabel = new JLabel("Conectando...");
+            JLabel turnoLabel = new JLabel("Esperando turno...");
             TecladoPanel teclado = new TecladoPanel();
 
-            JPanel panelSuperior = new JPanel(new GridLayout(2, 1));
+            JPanel panelSuperior = new JPanel(new GridLayout(3, 1));
             panelSuperior.add(palabraLabel);
+            panelSuperior.add(turnoLabel);
             panelSuperior.add(estadoLabel);
 
             ventana.add(panelSuperior, BorderLayout.NORTH);
@@ -28,10 +42,9 @@ public class ClienteAhorcado {
             ventana.setVisible(true);
 
             String ipServidor = "10.113.92.12";
-                new Thread(() -> {
-                    new ControladorCliente(ipServidor, panelDibujo, palabraLabel, estadoLabel, teclado);
-                }).start();
-
+            new Thread(() -> {
+                new ControladorCliente(ipServidor, nombreFinal, panelDibujo, palabraLabel, estadoLabel, turnoLabel, teclado);
+            }).start();
         });
     }
 }

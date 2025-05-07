@@ -10,6 +10,7 @@ public class JuegoAhorcado {
     private String palabra;
     private Set<Character> letrasAdivinadas;
     private int errores;
+    private static final int MAX_ERRORES = 5;
 
     public JuegoAhorcado() {
         this.palabra = PALABRAS[new Random().nextInt(PALABRAS.length)];
@@ -26,10 +27,12 @@ public class JuegoAhorcado {
 
         if (!palabra.contains(String.valueOf(letra))) {
             errores++;
+            System.out.println("Letra '" + letra + "' incorrecta. Errores: " + errores);
             return false;
         }
 
         letrasAdivinadas.add(letra);
+        System.out.println("Letra '" + letra + "' correcta. Letras adivinadas: " + letrasAdivinadas);
         return true;
     }
 
@@ -46,7 +49,7 @@ public class JuegoAhorcado {
     }
 
     public synchronized int getErroresRestantes() {
-        return errores >= 5 ? 0 : 5 - errores;
+        return MAX_ERRORES - errores;
     }
 
     public synchronized boolean estaGanado() {
@@ -59,7 +62,7 @@ public class JuegoAhorcado {
     }
 
     public synchronized boolean estaPerdido() {
-        return errores >= 5;
+        return errores >= MAX_ERRORES;
     }
 
     public synchronized String getPalabra() {
@@ -73,5 +76,10 @@ public class JuegoAhorcado {
     public synchronized void resetear() {
         this.letrasAdivinadas.clear();
         this.errores = 0;
+    }
+
+    // Método auxiliar para depuración
+    public synchronized int getErrores() {
+        return errores;
     }
 }
