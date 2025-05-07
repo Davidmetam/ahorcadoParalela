@@ -27,12 +27,11 @@ public class ClienteAhorcado {
 
             ventana.setVisible(true);
 
-            String ipServidor = JOptionPane.showInputDialog("IP del servidor:");
-            if (ipServidor != null && !ipServidor.isEmpty()) {
+            String ipServidor = "10.113.92.12";
                 new Thread(() -> {
                     new ControladorCliente(ipServidor, panelDibujo, palabraLabel, estadoLabel, teclado);
                 }).start();
-            }
+
         });
     }
 }

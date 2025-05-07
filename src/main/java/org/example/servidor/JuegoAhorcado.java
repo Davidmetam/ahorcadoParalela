@@ -7,8 +7,8 @@ public class JuegoAhorcado {
             "JAVA", "SOCKET", "PARALELO", "MULTIHILO", "SERVIDOR", "CLIENTE", "RED", "COMUNICACION"
     };
 
-    private final String palabra;
-    private final Set<Character> letrasAdivinadas;
+    private String palabra;
+    private Set<Character> letrasAdivinadas;
     private int errores;
 
     public JuegoAhorcado() {
@@ -46,7 +46,7 @@ public class JuegoAhorcado {
     }
 
     public synchronized int getErroresRestantes() {
-        return 5 - errores;
+        return errores >= 5 ? 0 : 5 - errores;
     }
 
     public synchronized boolean estaGanado() {
@@ -64,5 +64,14 @@ public class JuegoAhorcado {
 
     public synchronized String getPalabra() {
         return palabra;
+    }
+
+    public synchronized void setPalabra(String nuevaPalabra) {
+        this.palabra = nuevaPalabra;
+    }
+
+    public synchronized void resetear() {
+        this.letrasAdivinadas.clear();
+        this.errores = 0;
     }
 }

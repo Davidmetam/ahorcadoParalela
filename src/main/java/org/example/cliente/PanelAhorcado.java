@@ -5,9 +5,11 @@ import java.awt.*;
 
 public class PanelAhorcado extends JPanel {
     private int errores = 0;
+    private final int MAX_ERRORES = 5;  // Máximo de errores permitidos
 
     public void setErrores(int errores) {
-        this.errores = errores;
+        // Asegurarse de que los errores estén en un rango válido
+        this.errores = Math.min(Math.max(errores, 0), MAX_ERRORES);
         repaint();
     }
 
@@ -48,7 +50,9 @@ public class PanelAhorcado extends JPanel {
         g2.fillOval(centerX - 12, headY + 12, 24, 10);
         g2.fillOval(centerX - 12, headY + 19, 24, 10);
 
+        // Dibujamos secuencialmente las partes del ahorcado según el número de errores
         if (errores >= 1) {
+            // Cabeza
             g2.setColor(new Color(255, 220, 180)); // color piel
             g2.fillOval(centerX - 40, headY + 20, 80, 80);
 
@@ -65,39 +69,44 @@ public class PanelAhorcado extends JPanel {
 
             g2.setColor(Color.BLACK);
             g2.fillOval(centerX - 5, headY + 80, 10, 5);
-
         }
+
         if (errores >= 2) {
+            // Cuerpo
             g2.setColor(new Color(220, 50, 50)); // rojo
             g2.fillRect(centerX - 25, headY + 100, 50, 40);
             g2.setColor(Color.BLACK);
             g2.drawRect(centerX - 25, headY + 100, 50, 40);
         }
+
         if (errores >= 3) {
+            // Brazo izquierdo
             g2.setColor(new Color(150, 50, 150)); // morado
             g2.fillOval(centerX - 40, headY + 100, 20, 20);
             g2.setColor(Color.BLACK);
             g2.drawOval(centerX - 40, headY + 100, 20, 20);
-
         }
+
         if (errores >= 4) {
+            // Brazo derecho
             g2.setColor(new Color(150, 50, 150)); // morado
             g2.fillOval(centerX + 20, headY + 100, 20, 20);
             g2.setColor(Color.BLACK);
             g2.drawOval(centerX + 20, headY + 100, 20, 20);
         }
+
         if (errores >= 5) {
+            // Ambas piernas (pierna izquierda)
             g2.setColor(new Color(50, 50, 150)); // azul
             g2.fillRect(centerX - 20, headY + 140, 15, 30);
             g2.setColor(Color.BLACK);
             g2.drawRect(centerX - 20, headY + 140, 15, 30);
-        }
-        if (errores >= 6) {
+
+            // Pierna derecha
             g2.setColor(new Color(50, 50, 150)); // azul
             g2.fillRect(centerX + 5, headY + 140, 15, 30);
             g2.setColor(Color.BLACK);
             g2.drawRect(centerX + 5, headY + 140, 15, 30);
         }
-
     }
 }
