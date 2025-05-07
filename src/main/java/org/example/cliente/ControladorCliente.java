@@ -11,16 +11,14 @@ public class ControladorCliente {
 
     public ControladorCliente(String ip, PanelAhorcado panel, JLabel palabraLabel, JLabel estadoLabel, TecladoPanel teclado) {
         try {
-            socket = new Socket(ip, 1234);
+            socket = new Socket(ip, 5000);
             in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
             out = new PrintWriter(socket.getOutputStream(), true);
 
-            // Obtener estado inicial
             palabraLabel.setText("Palabra: " + in.readLine());
             int errores = Integer.parseInt(in.readLine());
             panel.setErrores(5 - errores);
 
-            // Teclado
             teclado.setListener(e -> {
                 JButton btn = (JButton) e.getSource();
                 char letra = btn.getText().charAt(0);
@@ -29,6 +27,10 @@ public class ControladorCliente {
 
                 try {
                     String resultado = in.readLine();
+                    if ("NO_ES_TU_TURNO".equals(resultado)) {
+                        estadoLabel.setText("Espera tu turno...");
+                        return;
+                    }
                     String nuevaPalabra = in.readLine();
                     int restantes = Integer.parseInt(in.readLine());
 
@@ -55,6 +57,6 @@ public class ControladorCliente {
     }
 
     private void desactivarTeclado(TecladoPanel teclado) {
-        teclado.setListener(e -> {}); // Elimina acciones
+        teclado.setListener(e -> {});
     }
 }
