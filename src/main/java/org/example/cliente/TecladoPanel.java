@@ -69,7 +69,6 @@ public class TecladoPanel extends JPanel {
         button.setOpaque(false);
         button.setCursor(new Cursor(Cursor.HAND_CURSOR));
         
-        // Set consistent size for all buttons
         button.setPreferredSize(new Dimension(50, 40));
         
         return button;
