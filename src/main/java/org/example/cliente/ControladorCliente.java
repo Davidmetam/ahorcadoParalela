@@ -88,6 +88,8 @@ public class ControladorCliente {
                 turnoLabel.setText("¡El juego ha terminado!");
                 estadoLabel.setText("¡Han perdido! Se agotaron los intentos");
                 desactivarTeclado(teclado);
+                // Asegurar que se muestre el ahorcado completo cuando se pierde
+                panel.setErrores(5);
 
                 try {
                     String palabraCompleta = in.readLine();

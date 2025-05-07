@@ -41,7 +41,7 @@ public class ClienteAhorcado {
 
             ventana.setVisible(true);
 
-            String ipServidor = "10.113.92.12";
+            String ipServidor = "192.168.137.177";
             new Thread(() -> {
                 new ControladorCliente(ipServidor, nombreFinal, panelDibujo, palabraLabel, estadoLabel, turnoLabel, teclado);
             }).start();

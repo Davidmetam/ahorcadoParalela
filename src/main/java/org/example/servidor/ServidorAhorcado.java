@@ -64,7 +64,7 @@ public class ServidorAhorcado {
         letrasUsadas.clear();
 
         System.out.println("¡Juego iniciado con " + jugadores.size() + " jugadores!");
-        System.out.println("La palabra a adivinar es: " + juegoCompartido.getPalabra());
+        //System.out.println("La palabra a adivinar es: " + juegoCompartido.getPalabra());
 
         broadcast("PALABRA:" + juegoCompartido.getEstadoPalabra());
         broadcast("ERRORES:" + juegoCompartido.getErroresRestantes());

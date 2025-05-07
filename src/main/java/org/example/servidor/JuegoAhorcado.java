@@ -4,7 +4,7 @@ import java.util.*;
 
 public class JuegoAhorcado {
     private static final String[] PALABRAS = {
-            "JAVA", "SOCKET", "PARALELO", "MULTIHILO", "SERVIDOR", "CLIENTE", "RED", "COMUNICACION"
+            "MICROSOFT", "AVESTRUZ", "PARALELISMO", "MULTIHILO", "SERVIDORES", "XENOFOBIA", "PARALELOGRAMO", "COMUNICACIONES"
     };
 
     private String palabra;
