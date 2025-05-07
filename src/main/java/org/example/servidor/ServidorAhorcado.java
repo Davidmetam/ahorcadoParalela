@@ -117,6 +117,38 @@ public class ServidorAhorcado {
         }
     }
 
+    /**
+     * Notifica a todos los jugadores conectados sobre el fin del juego,
+     * independientemente de si ya han tenido su turno o no.
+     * @param mensaje El mensaje de fin de juego ("GANASTE" o "PERDISTE")
+     */
+    public static void notificarFinDeJuegoATodos(String mensaje) {
+        // Asegurarse de que todos los jugadores reciban la notificación de fin de juego
+        System.out.println("Notificando fin de juego (" + mensaje + ") a todos los jugadores");
+
+        // Primero enviamos la palabra completa a todos los jugadores
+        String palabraCompleta = "LA PALABRA ERA: " + juegoCompartido.getPalabra();
+
+        // Ahora notificamos a cada jugador individualmente
+        for (Map.Entry<String, PrintWriter> entry : jugadores.entrySet()) {
+            String nombre = entry.getKey();
+            PrintWriter out = entry.getValue();
+
+            System.out.println("Notificando fin de juego a: " + nombre);
+
+            // Enviar 0 errores restantes para asegurar que se muestre el ahorcado completo
+            if (mensaje.equals("PERDISTE")) {
+                out.println("ERRORES:0");
+            }
+
+            // Enviar el mensaje de fin de juego
+            out.println(mensaje);
+
+            // Enviar la palabra completa
+            out.println(palabraCompleta);
+        }
+    }
+
     public static void broadcast(String mensaje) {
         System.out.println("Enviando a todos los clientes: " + mensaje);
         for (PrintWriter out : jugadores.values()) {

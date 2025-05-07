@@ -6,9 +6,7 @@
   <component name="ChangeListManager">
     <list default="true" id="d5ee735f-391c-4f64-873c-8a746acd12d7" name="Changes" comment="server adjustment">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/org/example/cliente/ClienteAhorcado.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/example/cliente/ClienteAhorcado.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/org/example/cliente/ControladorCliente.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/example/cliente/ControladorCliente.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/org/example/servidor/JuegoAhorcado.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/example/servidor/JuegoAhorcado.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/org/example/servidor/ManejadorCliente.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/example/servidor/ManejadorCliente.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/org/example/servidor/ServidorAhorcado.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/example/servidor/ServidorAhorcado.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -126,7 +124,7 @@
       <workItem from="1746595117130" duration="41000" />
       <workItem from="1746595168412" duration="31000" />
       <workItem from="1746595447948" duration="1537000" />
-      <workItem from="1746629936290" duration="2319000" />
+      <workItem from="1746629936290" duration="3255000" />
     </task>
     <task id="LOCAL-00001" summary="first commit">
       <option name="closed" value="true" />
@@ -184,7 +182,15 @@
       <option name="project" value="LOCAL" />
       <updated>1746628165783</updated>
     </task>
-    <option name="localTasksCounter" value="8" />
+    <task id="LOCAL-00008" summary="server adjustment">
+      <option name="closed" value="true" />
+      <created>1746632304094</created>
+      <option name="number" value="00008" />
+      <option name="presentableId" value="LOCAL-00008" />
+      <option name="project" value="LOCAL" />
+      <updated>1746632304094</updated>
+    </task>
+    <option name="localTasksCounter" value="9" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">

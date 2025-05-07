@@ -81,8 +81,8 @@ public class ManejadorCliente implements Runnable {
                             ServidorAhorcado.juegoIniciado.set(false);
                             System.out.println("Juego terminado: ¡Los jugadores han ganado!");
                         } else if (ServidorAhorcado.juegoCompartido.estaPerdido()) {
-                            // Asegurarse de que todos los clientes sepan que se han agotado los errores
-                            ServidorAhorcado.broadcast("ERRORES:0"); // 0 restantes = 5 errores
+
+                            ServidorAhorcado.broadcast("ERRORES:0");
                             ServidorAhorcado.broadcast("PERDISTE");
                             ServidorAhorcado.broadcast("LA PALABRA ERA: " + ServidorAhorcado.juegoCompartido.getPalabra());
                             ServidorAhorcado.juegoIniciado.set(false);

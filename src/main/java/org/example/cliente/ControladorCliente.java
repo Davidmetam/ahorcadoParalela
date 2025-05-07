@@ -90,14 +90,17 @@ public class ControladorCliente {
                 desactivarTeclado(teclado);
                 // Asegurar que se muestre el ahorcado completo cuando se pierde
                 panel.setErrores(5);
+                System.out.println("Juego perdido: mostrando ahorcado completo");
 
                 try {
                     String palabraCompleta = in.readLine();
                     if (palabraCompleta != null && palabraCompleta.startsWith("LA PALABRA ERA:")) {
                         palabraLabel.setText(palabraCompleta);
+                        System.out.println("Palabra completa recibida: " + palabraCompleta);
                     }
                 } catch (IOException e) {
                     estadoLabel.setText("Error recibiendo palabra completa");
+                    e.printStackTrace();
                 }
                 break;
 
