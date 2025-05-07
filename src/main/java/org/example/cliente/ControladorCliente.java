@@ -15,12 +15,10 @@ public class ControladorCliente {
             in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
             out = new PrintWriter(socket.getOutputStream(), true);
 
-            // Obtener estado inicial
             palabraLabel.setText("Palabra: " + in.readLine());
             int errores = Integer.parseInt(in.readLine());
             panel.setErrores(5 - errores);
 
-            // Teclado
             teclado.setListener(e -> {
                 JButton btn = (JButton) e.getSource();
                 char letra = btn.getText().charAt(0);

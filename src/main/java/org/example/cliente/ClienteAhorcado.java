@@ -9,15 +9,14 @@ public class ClienteAhorcado {
             JFrame ventana = new JFrame("Ahorcado Cliente");
             ventana.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
             ventana.setSize(500, 600);
+            ventana.setResizable(false);
             ventana.setLayout(new BorderLayout());
 
-            // Paneles
             PanelAhorcado panelDibujo = new PanelAhorcado();
             JLabel palabraLabel = new JLabel("Palabra: ");
             JLabel estadoLabel = new JLabel("Conectando...");
             TecladoPanel teclado = new TecladoPanel();
 
-            // Layout
             JPanel panelSuperior = new JPanel(new GridLayout(2, 1));
             panelSuperior.add(palabraLabel);
             panelSuperior.add(estadoLabel);
@@ -28,7 +27,6 @@ public class ClienteAhorcado {
 
             ventana.setVisible(true);
 
-            // Iniciar controlador
             String ipServidor = JOptionPane.showInputDialog("IP del servidor:");
             if (ipServidor != null && !ipServidor.isEmpty()) {
                 new Thread(() -> {
