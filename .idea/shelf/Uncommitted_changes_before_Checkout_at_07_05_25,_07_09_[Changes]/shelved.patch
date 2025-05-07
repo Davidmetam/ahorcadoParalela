@@ -1,0 +1,271 @@
+Index: src/main/java/org/example/servidor/ServidorAhorcado.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package org.example.servidor;\n\nimport java.io.IOException;\nimport java.io.PrintWriter;\nimport java.net.ServerSocket;\nimport java.net.Socket;\nimport java.util.*;\n\npublic class ServidorAhorcado {\n    public static final int PUERTO = 5000;\n    private static JuegoAhorcado juegoCompartido = new JuegoAhorcado();\n    private static final List<PrintWriter> clientes = Collections.synchronizedList(new ArrayList<>());\n    private static int turnoActual = 0;\n\n    public static void main(String[] args) {\n        System.out.println(\"Servidor del Ahorcado iniciado en el puerto \" + PUERTO);\n\n        try (ServerSocket servidor = new ServerSocket(PUERTO)) {\n            while (true) {\n                Socket cliente = servidor.accept();\n                System.out.println(\"Cliente conectado: \" + cliente.getInetAddress());\n\n                new Thread(new ManejadorCliente(cliente, juegoCompartido, clientes)).start();\n            }\n        } catch (IOException e) {\n            e.printStackTrace();\n        }\n    }\n\n    // Método sincronizado para controlar el turno\n    public static synchronized boolean esSuTurno(PrintWriter out) {\n        return clientes.indexOf(out) == turnoActual;\n    }\n\n    public static synchronized void avanzarTurno() {\n        if (!clientes.isEmpty()) {\n            turnoActual = (turnoActual + 1) % clientes.size();\n        }\n    }\n}\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/main/java/org/example/servidor/ServidorAhorcado.java b/src/main/java/org/example/servidor/ServidorAhorcado.java
+--- a/src/main/java/org/example/servidor/ServidorAhorcado.java	(revision 0ddebb9ed0aa4e7dcdffb085d12693f529c34ccd)
++++ b/src/main/java/org/example/servidor/ServidorAhorcado.java	(date 1746623262125)
+@@ -8,9 +8,8 @@
+ 
+ public class ServidorAhorcado {
+     public static final int PUERTO = 5000;
+-    private static JuegoAhorcado juegoCompartido = new JuegoAhorcado();
+-    private static final List<PrintWriter> clientes = Collections.synchronizedList(new ArrayList<>());
+-    private static int turnoActual = 0;
++    public static final JuegoAhorcado juegoCompartido = new JuegoAhorcado();
++    public static final List<PrintWriter> clientesConectados = Collections.synchronizedList(new ArrayList<>());
+ 
+     public static void main(String[] args) {
+         System.out.println("Servidor del Ahorcado iniciado en el puerto " + PUERTO);
+@@ -20,21 +19,18 @@
+                 Socket cliente = servidor.accept();
+                 System.out.println("Cliente conectado: " + cliente.getInetAddress());
+ 
+-                new Thread(new ManejadorCliente(cliente, juegoCompartido, clientes)).start();
++                new Thread(new ManejadorCliente(cliente)).start();
+             }
+         } catch (IOException e) {
+             e.printStackTrace();
+         }
+     }
+ 
+-    // Método sincronizado para controlar el turno
+-    public static synchronized boolean esSuTurno(PrintWriter out) {
+-        return clientes.indexOf(out) == turnoActual;
+-    }
+-
+-    public static synchronized void avanzarTurno() {
+-        if (!clientes.isEmpty()) {
+-            turnoActual = (turnoActual + 1) % clientes.size();
++    public static void broadcast(String mensaje) {
++        synchronized (clientesConectados) {
++            for (PrintWriter out : clientesConectados) {
++                out.println(mensaje);
++            }
+         }
+     }
+ }
+Index: src/main/java/org/example/servidor/ManejadorCliente.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package org.example.servidor;\n\nimport java.io.BufferedReader;\nimport java.io.IOException;\nimport java.io.InputStreamReader;\nimport java.io.PrintWriter;\nimport java.net.Socket;\nimport java.util.List;\n\npublic class ManejadorCliente implements Runnable {\n    private Socket socket;\n    private JuegoAhorcado juego;\n    private List<PrintWriter> clientes;\n    private PrintWriter out;\n\n    public ManejadorCliente(Socket socket, JuegoAhorcado juego, List<PrintWriter> clientes) {\n        this.socket = socket;\n        this.juego = juego;\n        this.clientes = clientes;\n    }\n\n    @Override\n    public void run() {\n        try (\n                BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));\n        ) {\n            out = new PrintWriter(socket.getOutputStream(), true);\n            clientes.add(out);\n\n            out.println(juego.getEstadoPalabra());\n            out.println(juego.getErroresRestantes());\n\n            String entrada;\n            while ((entrada = in.readLine()) != null) {\n                if (!ServidorAhorcado.esSuTurno(out)) {\n                    out.println(\"NO_ES_TU_TURNO\");\n                    continue;\n                }\n\n                char letra = entrada.toUpperCase().charAt(0);\n                synchronized (juego) {\n                    boolean acierto = juego.intentar(letra);\n\n                    for (PrintWriter cliente : clientes) {\n                        cliente.println(acierto ? \"CORRECTO\" : \"INCORRECTO\");\n                        cliente.println(juego.getEstadoPalabra());\n                        cliente.println(juego.getErroresRestantes());\n                    }\n\n                    if (juego.estaGanado()) {\n                        for (PrintWriter cliente : clientes) {\n                            cliente.println(\"GANASTE\");\n                        }\n                        break;\n                    }\n\n                    if (juego.estaPerdido()) {\n                        for (PrintWriter cliente : clientes) {\n                            cliente.println(\"PERDISTE\");\n                            cliente.println(\"LA PALABRA ERA: \" + juego.getPalabra());\n                        }\n                        break;\n                    }\n\n                    ServidorAhorcado.avanzarTurno();\n                }\n            }\n\n        } catch (IOException e) {\n            System.out.println(\"Error con cliente: \" + e.getMessage());\n        }\n    }\n}\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/main/java/org/example/servidor/ManejadorCliente.java b/src/main/java/org/example/servidor/ManejadorCliente.java
+--- a/src/main/java/org/example/servidor/ManejadorCliente.java	(revision 0ddebb9ed0aa4e7dcdffb085d12693f529c34ccd)
++++ b/src/main/java/org/example/servidor/ManejadorCliente.java	(date 1746623134125)
+@@ -1,68 +1,47 @@
+ package org.example.servidor;
+ 
+-import java.io.BufferedReader;
+-import java.io.IOException;
+-import java.io.InputStreamReader;
+-import java.io.PrintWriter;
++import java.io.*;
+ import java.net.Socket;
+-import java.util.List;
+ 
+ public class ManejadorCliente implements Runnable {
+     private Socket socket;
+-    private JuegoAhorcado juego;
+-    private List<PrintWriter> clientes;
+-    private PrintWriter out;
+ 
+-    public ManejadorCliente(Socket socket, JuegoAhorcado juego, List<PrintWriter> clientes) {
++    public ManejadorCliente(Socket socket) {
+         this.socket = socket;
+-        this.juego = juego;
+-        this.clientes = clientes;
+     }
+ 
+     @Override
+     public void run() {
+         try (
+                 BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
++                PrintWriter out = new PrintWriter(socket.getOutputStream(), true)
+         ) {
+-            out = new PrintWriter(socket.getOutputStream(), true);
+-            clientes.add(out);
++            // Añadir cliente a la lista compartida
++            ServidorAhorcado.clientesConectados.add(out);
+ 
+-            out.println(juego.getEstadoPalabra());
+-            out.println(juego.getErroresRestantes());
++            // Enviar estado inicial
++            out.println(ServidorAhorcado.juegoCompartido.getEstadoPalabra());
++            out.println(ServidorAhorcado.juegoCompartido.getErroresRestantes());
+ 
+             String entrada;
+             while ((entrada = in.readLine()) != null) {
+-                if (!ServidorAhorcado.esSuTurno(out)) {
+-                    out.println("NO_ES_TU_TURNO");
+-                    continue;
+-                }
+-
+                 char letra = entrada.toUpperCase().charAt(0);
+-                synchronized (juego) {
+-                    boolean acierto = juego.intentar(letra);
++                boolean acierto = ServidorAhorcado.juegoCompartido.intentar(letra);
+ 
+-                    for (PrintWriter cliente : clientes) {
+-                        cliente.println(acierto ? "CORRECTO" : "INCORRECTO");
+-                        cliente.println(juego.getEstadoPalabra());
+-                        cliente.println(juego.getErroresRestantes());
+-                    }
++                // Enviar actualización a todos
++                ServidorAhorcado.broadcast(acierto ? "CORRECTO" : "INCORRECTO");
++                ServidorAhorcado.broadcast(ServidorAhorcado.juegoCompartido.getEstadoPalabra());
++                ServidorAhorcado.broadcast(ServidorAhorcado.juegoCompartido.getErroresRestantes() + "");
+ 
+-                    if (juego.estaGanado()) {
+-                        for (PrintWriter cliente : clientes) {
+-                            cliente.println("GANASTE");
+-                        }
+-                        break;
+-                    }
++                if (ServidorAhorcado.juegoCompartido.estaGanado()) {
++                    ServidorAhorcado.broadcast("GANASTE");
++                    break;
++                }
+ 
+-                    if (juego.estaPerdido()) {
+-                        for (PrintWriter cliente : clientes) {
+-                            cliente.println("PERDISTE");
+-                            cliente.println("LA PALABRA ERA: " + juego.getPalabra());
+-                        }
+-                        break;
+-                    }
+-
+-                    ServidorAhorcado.avanzarTurno();
++                if (ServidorAhorcado.juegoCompartido.estaPerdido()) {
++                    ServidorAhorcado.broadcast("PERDISTE");
++                    ServidorAhorcado.broadcast("LA PALABRA ERA: " + ServidorAhorcado.juegoCompartido.getPalabra());
++                    break;
+                 }
+             }
+ 
+Index: src/main/java/org/example/servidor/JuegoAhorcado.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package org.example.servidor;\n\nimport java.util.*;\n\npublic class JuegoAhorcado {\n    private static final String[] PALABRAS = {\n            \"JAVA\", \"SOCKET\", \"PARALELO\", \"MULTIHILO\", \"SERVIDOR\", \"CLIENTE\", \"RED\", \"COMUNICACION\"\n    };\n\n    private final String palabra;\n    private final Set<Character> letrasAdivinadas;\n    private int errores;\n\n    public JuegoAhorcado() {\n        this.palabra = PALABRAS[new Random().nextInt(PALABRAS.length)];\n        this.letrasAdivinadas = new HashSet<>();\n        this.errores = 0;\n    }\n\n    public boolean intentar(char letra) {\n        letra = Character.toUpperCase(letra);\n\n        if (!palabra.contains(String.valueOf(letra))) {\n            errores++;\n            return false;\n        }\n\n        letrasAdivinadas.add(letra);\n        return true;\n    }\n\n    public String getEstadoPalabra() {\n        StringBuilder estado = new StringBuilder();\n        for (char c : palabra.toCharArray()) {\n            if (letrasAdivinadas.contains(c)) {\n                estado.append(c).append(\" \");\n            } else {\n                estado.append(\"_ \");\n            }\n        }\n        return estado.toString().trim();\n    }\n\n    public int getErroresRestantes() {\n        return 5 - errores;\n    }\n\n    public boolean estaGanado() {\n        for (char c : palabra.toCharArray()) {\n            if (!letrasAdivinadas.contains(c)) {\n                return false;\n            }\n        }\n        return true;\n    }\n\n    public boolean estaPerdido() {\n        return errores >= 5;\n    }\n\n    public String getPalabra() {\n        return palabra;\n    }\n}\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/main/java/org/example/servidor/JuegoAhorcado.java b/src/main/java/org/example/servidor/JuegoAhorcado.java
+--- a/src/main/java/org/example/servidor/JuegoAhorcado.java	(revision 0ddebb9ed0aa4e7dcdffb085d12693f529c34ccd)
++++ b/src/main/java/org/example/servidor/JuegoAhorcado.java	(date 1746623137669)
+@@ -17,9 +17,13 @@
+         this.errores = 0;
+     }
+ 
+-    public boolean intentar(char letra) {
++    public synchronized boolean intentar(char letra) {
+         letra = Character.toUpperCase(letra);
+ 
++        if (letrasAdivinadas.contains(letra)) {
++            return true; // ya fue adivinada
++        }
++
+         if (!palabra.contains(String.valueOf(letra))) {
+             errores++;
+             return false;
+@@ -29,7 +33,7 @@
+         return true;
+     }
+ 
+-    public String getEstadoPalabra() {
++    public synchronized String getEstadoPalabra() {
+         StringBuilder estado = new StringBuilder();
+         for (char c : palabra.toCharArray()) {
+             if (letrasAdivinadas.contains(c)) {
+@@ -41,11 +45,11 @@
+         return estado.toString().trim();
+     }
+ 
+-    public int getErroresRestantes() {
++    public synchronized int getErroresRestantes() {
+         return 5 - errores;
+     }
+ 
+-    public boolean estaGanado() {
++    public synchronized boolean estaGanado() {
+         for (char c : palabra.toCharArray()) {
+             if (!letrasAdivinadas.contains(c)) {
+                 return false;
+@@ -54,11 +58,11 @@
+         return true;
+     }
+ 
+-    public boolean estaPerdido() {
++    public synchronized boolean estaPerdido() {
+         return errores >= 5;
+     }
+ 
+-    public String getPalabra() {
++    public synchronized String getPalabra() {
+         return palabra;
+     }
+ }
+Index: .idea/workspace.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+><?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<project version=\"4\">\n  <component name=\"AutoImportSettings\">\n    <option name=\"autoReloadType\" value=\"SELECTIVE\" />\n  </component>\n  <component name=\"ChangeListManager\">\n    <list default=\"true\" id=\"d5ee735f-391c-4f64-873c-8a746acd12d7\" name=\"Changes\" comment=\"add files\">\n      <change beforePath=\"$PROJECT_DIR$/src/main/java/org/example/cliente/ClienteAhorcado.java\" beforeDir=\"false\" afterPath=\"$PROJECT_DIR$/src/main/java/org/example/cliente/ClienteAhorcado.java\" afterDir=\"false\" />\n      <change beforePath=\"$PROJECT_DIR$/src/main/java/org/example/cliente/ControladorCliente.java\" beforeDir=\"false\" afterPath=\"$PROJECT_DIR$/src/main/java/org/example/cliente/ControladorCliente.java\" afterDir=\"false\" />\n      <change beforePath=\"$PROJECT_DIR$/src/main/java/org/example/cliente/PanelAhorcado.java\" beforeDir=\"false\" afterPath=\"$PROJECT_DIR$/src/main/java/org/example/cliente/PanelAhorcado.java\" afterDir=\"false\" />\n      <change beforePath=\"$PROJECT_DIR$/src/main/java/org/example/servidor/ManejadorCliente.java\" beforeDir=\"false\" afterPath=\"$PROJECT_DIR$/src/main/java/org/example/servidor/ManejadorCliente.java\" afterDir=\"false\" />\n    </list>\n    <option name=\"SHOW_DIALOG\" value=\"false\" />\n    <option name=\"HIGHLIGHT_CONFLICTS\" value=\"true\" />\n    <option name=\"HIGHLIGHT_NON_ACTIVE_CHANGELIST\" value=\"false\" />\n    <option name=\"LAST_RESOLUTION\" value=\"IGNORE\" />\n  </component>\n  <component name=\"Git.Settings\">\n    <option name=\"RECENT_BRANCH_BY_REPOSITORY\">\n      <map>\n        <entry key=\"$PROJECT_DIR$\" value=\"master\" />\n      </map>\n    </option>\n    <option name=\"RECENT_GIT_ROOT_PATH\" value=\"$PROJECT_DIR$\" />\n  </component>\n  <component name=\"ProjectColorInfo\">{\n  &quot;associatedIndex&quot;: 6\n}</component>\n  <component name=\"ProjectId\" id=\"2wkopb3UvNhWtBaHSPNK1RAEXKa\" />\n  <component name=\"ProjectLevelVcsManager\" settingsEditedManually=\"true\" />\n  <component name=\"ProjectViewState\">\n    <option name=\"hideEmptyMiddlePackages\" value=\"true\" />\n    <option name=\"showLibraryContents\" value=\"true\" />\n  </component>\n  <component name=\"PropertiesComponent\"><![CDATA[{\n  \"keyToString\": {\n    \"Application.ClienteAhorcado.executor\": \"Run\",\n    \"Maven. [org.apache.maven.plugins:maven-archetype-plugin:RELEASE:generate].executor\": \"Run\",\n    \"RunOnceActivity.OpenProjectViewOnStart\": \"true\",\n    \"RunOnceActivity.ShowReadmeOnStart\": \"true\",\n    \"git-widget-placeholder\": \"ajustesServidor\",\n    \"kotlin-language-version-configured\": \"true\",\n    \"nodejs_package_manager_path\": \"npm\",\n    \"vue.rearranger.settings.migration\": \"true\"\n  }\n}]]></component>\n  <component name=\"RecentsManager\">\n    <key name=\"MoveFile.RECENT_KEYS\">\n      <recent name=\"D:\\Usuarios\\david\\Documentos\\CETI\\Actividades\\Quinto\\computacionParalela\\ahorcado\\ahorcado\\src\\main\\java\\org\\example\\servidor\" />\n      <recent name=\"D:\\Usuarios\\david\\Documentos\\CETI\\Actividades\\Quinto\\computacionParalela\\ahorcado\\ahorcado\\src\\main\\java\\org\\example\\cliente\" />\n    </key>\n  </component>\n  <component name=\"RunManager\" selected=\"Application.ClienteAhorcado\">\n    <configuration name=\"ClienteAhorcado\" type=\"Application\" factoryName=\"Application\" singleton=\"false\" temporary=\"true\" nameIsGenerated=\"true\">\n      <option name=\"MAIN_CLASS_NAME\" value=\"org.example.cliente.ClienteAhorcado\" />\n      <module name=\"ahorcado\" />\n      <extension name=\"coverage\">\n        <pattern>\n          <option name=\"PATTERN\" value=\"org.example.cliente.*\" />\n          <option name=\"ENABLED\" value=\"true\" />\n        </pattern>\n      </extension>\n      <method v=\"2\">\n        <option name=\"Make\" enabled=\"true\" />\n      </method>\n    </configuration>\n    <configuration name=\"ServidorAhorcado\" type=\"Application\" factoryName=\"Application\" temporary=\"true\" nameIsGenerated=\"true\">\n      <option name=\"MAIN_CLASS_NAME\" value=\"org.example.servidor.ServidorAhorcado\" />\n      <module name=\"ahorcado\" />\n      <extension name=\"coverage\">\n        <pattern>\n          <option name=\"PATTERN\" value=\"org.example.servidor.*\" />\n          <option name=\"ENABLED\" value=\"true\" />\n        </pattern>\n      </extension>\n      <method v=\"2\">\n        <option name=\"Make\" enabled=\"true\" />\n      </method>\n    </configuration>\n    <list>\n      <item itemvalue=\"Application.ClienteAhorcado\" />\n      <item itemvalue=\"Application.ServidorAhorcado\" />\n    </list>\n    <recent_temporary>\n      <list>\n        <item itemvalue=\"Application.ClienteAhorcado\" />\n        <item itemvalue=\"Application.ServidorAhorcado\" />\n      </list>\n    </recent_temporary>\n  </component>\n  <component name=\"SpellCheckerSettings\" RuntimeDictionaries=\"0\" Folders=\"0\" CustomDictionaries=\"0\" DefaultDictionary=\"application-level\" UseSingleDictionary=\"true\" transferred=\"true\" />\n  <component name=\"TaskManager\">\n    <task active=\"true\" id=\"Default\" summary=\"Default task\">\n      <changelist id=\"d5ee735f-391c-4f64-873c-8a746acd12d7\" name=\"Changes\" comment=\"\" />\n      <created>1746594425798</created>\n      <option name=\"number\" value=\"Default\" />\n      <option name=\"presentableId\" value=\"Default\" />\n      <updated>1746594425798</updated>\n      <workItem from=\"1746594426858\" duration=\"246000\" />\n      <workItem from=\"1746595117130\" duration=\"41000\" />\n      <workItem from=\"1746595168412\" duration=\"31000\" />\n    </task>\n    <task id=\"LOCAL-00001\" summary=\"first commit\">\n      <option name=\"closed\" value=\"true\" />\n      <created>1746594503864</created>\n      <option name=\"number\" value=\"00001\" />\n      <option name=\"presentableId\" value=\"LOCAL-00001\" />\n      <option name=\"project\" value=\"LOCAL\" />\n      <updated>1746594503864</updated>\n    </task>\n    <task id=\"LOCAL-00002\" summary=\"add files\">\n      <option name=\"closed\" value=\"true\" />\n      <created>1746594627366</created>\n      <option name=\"number\" value=\"00002\" />\n      <option name=\"presentableId\" value=\"LOCAL-00002\" />\n      <option name=\"project\" value=\"LOCAL\" />\n      <updated>1746594627366</updated>\n    </task>\n    <option name=\"localTasksCounter\" value=\"3\" />\n    <servers />\n  </component>\n  <component name=\"TypeScriptGeneratedFilesManager\">\n    <option name=\"version\" value=\"3\" />\n  </component>\n  <component name=\"VcsManagerConfiguration\">\n    <MESSAGE value=\"first commit\" />\n    <MESSAGE value=\"add files\" />\n    <option name=\"LAST_COMMIT_MESSAGE\" value=\"add files\" />\n  </component>\n</project>
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/.idea/workspace.xml b/.idea/workspace.xml
+--- a/.idea/workspace.xml	(revision 0ddebb9ed0aa4e7dcdffb085d12693f529c34ccd)
++++ b/.idea/workspace.xml	(date 1746623293153)
+@@ -5,10 +5,7 @@
+   </component>
+   <component name="ChangeListManager">
+     <list default="true" id="d5ee735f-391c-4f64-873c-8a746acd12d7" name="Changes" comment="add files">
+-      <change beforePath="$PROJECT_DIR$/src/main/java/org/example/cliente/ClienteAhorcado.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/example/cliente/ClienteAhorcado.java" afterDir="false" />
+-      <change beforePath="$PROJECT_DIR$/src/main/java/org/example/cliente/ControladorCliente.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/example/cliente/ControladorCliente.java" afterDir="false" />
+-      <change beforePath="$PROJECT_DIR$/src/main/java/org/example/cliente/PanelAhorcado.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/example/cliente/PanelAhorcado.java" afterDir="false" />
+-      <change beforePath="$PROJECT_DIR$/src/main/java/org/example/servidor/ManejadorCliente.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/example/servidor/ManejadorCliente.java" afterDir="false" />
++      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+     </list>
+     <option name="SHOW_DIALOG" value="false" />
+     <option name="HIGHLIGHT_CONFLICTS" value="true" />
+@@ -27,23 +24,24 @@
+   &quot;associatedIndex&quot;: 6
+ }</component>
+   <component name="ProjectId" id="2wkopb3UvNhWtBaHSPNK1RAEXKa" />
+-  <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
+   <component name="ProjectViewState">
+     <option name="hideEmptyMiddlePackages" value="true" />
+     <option name="showLibraryContents" value="true" />
+   </component>
+-  <component name="PropertiesComponent"><![CDATA[{
+-  "keyToString": {
+-    "Application.ClienteAhorcado.executor": "Run",
+-    "Maven. [org.apache.maven.plugins:maven-archetype-plugin:RELEASE:generate].executor": "Run",
+-    "RunOnceActivity.OpenProjectViewOnStart": "true",
+-    "RunOnceActivity.ShowReadmeOnStart": "true",
+-    "git-widget-placeholder": "ajustesServidor",
+-    "kotlin-language-version-configured": "true",
+-    "nodejs_package_manager_path": "npm",
+-    "vue.rearranger.settings.migration": "true"
++  <component name="PropertiesComponent">{
++  &quot;keyToString&quot;: {
++    &quot;Application.ClienteAhorcado.executor&quot;: &quot;Run&quot;,
++    &quot;Application.ServidorAhorcado.executor&quot;: &quot;Run&quot;,
++    &quot;Maven. [org.apache.maven.plugins:maven-archetype-plugin:RELEASE:generate].executor&quot;: &quot;Run&quot;,
++    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
++    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
++    &quot;git-widget-placeholder&quot;: &quot;ajustesServidor&quot;,
++    &quot;kotlin-language-version-configured&quot;: &quot;true&quot;,
++    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
++    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
++    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
+   }
+-}]]></component>
++}</component>
+   <component name="RecentsManager">
+     <key name="MoveFile.RECENT_KEYS">
+       <recent name="D:\Usuarios\david\Documentos\CETI\Actividades\Quinto\computacionParalela\ahorcado\ahorcado\src\main\java\org\example\servidor" />

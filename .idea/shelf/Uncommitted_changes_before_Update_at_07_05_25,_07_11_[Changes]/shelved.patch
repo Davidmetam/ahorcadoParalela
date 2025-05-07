@@ -1,0 +1,151 @@
+Index: src/main/java/org/example/servidor/JuegoAhorcado.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package org.example.servidor;\n\nimport java.util.*;\n\npublic class JuegoAhorcado {\n    private static final String[] PALABRAS = {\n            \"JAVA\", \"SOCKET\", \"PARALELO\", \"MULTIHILO\", \"SERVIDOR\", \"CLIENTE\", \"RED\", \"COMUNICACION\"\n    };\n\n    private final String palabra;\n    private final Set<Character> letrasAdivinadas;\n    private int errores;\n\n    public JuegoAhorcado() {\n        this.palabra = PALABRAS[new Random().nextInt(PALABRAS.length)];\n        this.letrasAdivinadas = new HashSet<>();\n        this.errores = 0;\n    }\n\n    public boolean intentar(char letra) {\n        letra = Character.toUpperCase(letra);\n\n        if (!palabra.contains(String.valueOf(letra))) {\n            errores++;\n            return false;\n        }\n\n        letrasAdivinadas.add(letra);\n        return true;\n    }\n\n    public String getEstadoPalabra() {\n        StringBuilder estado = new StringBuilder();\n        for (char c : palabra.toCharArray()) {\n            if (letrasAdivinadas.contains(c)) {\n                estado.append(c).append(\" \");\n            } else {\n                estado.append(\"_ \");\n            }\n        }\n        return estado.toString().trim();\n    }\n\n    public int getErroresRestantes() {\n        return 5 - errores;\n    }\n\n    public boolean estaGanado() {\n        for (char c : palabra.toCharArray()) {\n            if (!letrasAdivinadas.contains(c)) {\n                return false;\n            }\n        }\n        return true;\n    }\n\n    public boolean estaPerdido() {\n        return errores >= 5;\n    }\n\n    public String getPalabra() {\n        return palabra;\n    }\n}\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/main/java/org/example/servidor/JuegoAhorcado.java b/src/main/java/org/example/servidor/JuegoAhorcado.java
+--- a/src/main/java/org/example/servidor/JuegoAhorcado.java	(revision d7c2adc8b7da7033a03f6ddbc966fd7c5fabba96)
++++ b/src/main/java/org/example/servidor/JuegoAhorcado.java	(date 1746623394706)
+@@ -17,9 +17,13 @@
+         this.errores = 0;
+     }
+ 
+-    public boolean intentar(char letra) {
++    public synchronized boolean intentar(char letra) {
+         letra = Character.toUpperCase(letra);
+ 
++        if (letrasAdivinadas.contains(letra)) {
++            return true; // ya fue adivinada
++        }
++
+         if (!palabra.contains(String.valueOf(letra))) {
+             errores++;
+             return false;
+@@ -29,7 +33,7 @@
+         return true;
+     }
+ 
+-    public String getEstadoPalabra() {
++    public synchronized String getEstadoPalabra() {
+         StringBuilder estado = new StringBuilder();
+         for (char c : palabra.toCharArray()) {
+             if (letrasAdivinadas.contains(c)) {
+@@ -41,11 +45,11 @@
+         return estado.toString().trim();
+     }
+ 
+-    public int getErroresRestantes() {
++    public synchronized int getErroresRestantes() {
+         return 5 - errores;
+     }
+ 
+-    public boolean estaGanado() {
++    public synchronized boolean estaGanado() {
+         for (char c : palabra.toCharArray()) {
+             if (!letrasAdivinadas.contains(c)) {
+                 return false;
+@@ -54,11 +58,11 @@
+         return true;
+     }
+ 
+-    public boolean estaPerdido() {
++    public synchronized boolean estaPerdido() {
+         return errores >= 5;
+     }
+ 
+-    public String getPalabra() {
++    public synchronized String getPalabra() {
+         return palabra;
+     }
+ }
+Index: .idea/workspace.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+><?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<project version=\"4\">\n  <component name=\"AutoImportSettings\">\n    <option name=\"autoReloadType\" value=\"SELECTIVE\" />\n  </component>\n  <component name=\"ChangeListManager\">\n    <list default=\"true\" id=\"d5ee735f-391c-4f64-873c-8a746acd12d7\" name=\"Changes\" comment=\"add files\">\n      <change beforePath=\"$PROJECT_DIR$/.idea/vcs.xml\" beforeDir=\"false\" />\n      <change beforePath=\"$PROJECT_DIR$/.idea/workspace.xml\" beforeDir=\"false\" afterPath=\"$PROJECT_DIR$/.idea/workspace.xml\" afterDir=\"false\" />\n    </list>\n    <option name=\"SHOW_DIALOG\" value=\"false\" />\n    <option name=\"HIGHLIGHT_CONFLICTS\" value=\"true\" />\n    <option name=\"HIGHLIGHT_NON_ACTIVE_CHANGELIST\" value=\"false\" />\n    <option name=\"LAST_RESOLUTION\" value=\"IGNORE\" />\n  </component>\n  <component name=\"Git.Settings\">\n    <option name=\"RECENT_GIT_ROOT_PATH\" value=\"$PROJECT_DIR$\" />\n  </component>\n  <component name=\"ProjectColorInfo\">{\n  &quot;associatedIndex&quot;: 6\n}</component>\n  <component name=\"ProjectId\" id=\"2wkopb3UvNhWtBaHSPNK1RAEXKa\" />\n  <component name=\"ProjectLevelVcsManager\" settingsEditedManually=\"true\" />\n  <component name=\"ProjectViewState\">\n    <option name=\"hideEmptyMiddlePackages\" value=\"true\" />\n    <option name=\"showLibraryContents\" value=\"true\" />\n  </component>\n  <component name=\"PropertiesComponent\">{\n  &quot;keyToString&quot;: {\n    &quot;Maven. [org.apache.maven.plugins:maven-archetype-plugin:RELEASE:generate].executor&quot;: &quot;Run&quot;,\n    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,\n    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,\n    &quot;git-widget-placeholder&quot;: &quot;master&quot;,\n    &quot;kotlin-language-version-configured&quot;: &quot;true&quot;,\n    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,\n    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;\n  }\n}</component>\n  <component name=\"RecentsManager\">\n    <key name=\"MoveFile.RECENT_KEYS\">\n      <recent name=\"D:\\Usuarios\\david\\Documentos\\CETI\\Actividades\\Quinto\\computacionParalela\\ahorcado\\ahorcado\\src\\main\\java\\org\\example\\servidor\" />\n      <recent name=\"D:\\Usuarios\\david\\Documentos\\CETI\\Actividades\\Quinto\\computacionParalela\\ahorcado\\ahorcado\\src\\main\\java\\org\\example\\cliente\" />\n    </key>\n  </component>\n  <component name=\"SpellCheckerSettings\" RuntimeDictionaries=\"0\" Folders=\"0\" CustomDictionaries=\"0\" DefaultDictionary=\"application-level\" UseSingleDictionary=\"true\" transferred=\"true\" />\n  <component name=\"TaskManager\">\n    <task active=\"true\" id=\"Default\" summary=\"Default task\">\n      <changelist id=\"d5ee735f-391c-4f64-873c-8a746acd12d7\" name=\"Changes\" comment=\"\" />\n      <created>1746594425798</created>\n      <option name=\"number\" value=\"Default\" />\n      <option name=\"presentableId\" value=\"Default\" />\n      <updated>1746594425798</updated>\n      <workItem from=\"1746594426858\" duration=\"246000\" />\n      <workItem from=\"1746595117130\" duration=\"41000\" />\n      <workItem from=\"1746595168412\" duration=\"31000\" />\n    </task>\n    <task id=\"LOCAL-00001\" summary=\"first commit\">\n      <option name=\"closed\" value=\"true\" />\n      <created>1746594503864</created>\n      <option name=\"number\" value=\"00001\" />\n      <option name=\"presentableId\" value=\"LOCAL-00001\" />\n      <option name=\"project\" value=\"LOCAL\" />\n      <updated>1746594503864</updated>\n    </task>\n    <task id=\"LOCAL-00002\" summary=\"add files\">\n      <option name=\"closed\" value=\"true\" />\n      <created>1746594627366</created>\n      <option name=\"number\" value=\"00002\" />\n      <option name=\"presentableId\" value=\"LOCAL-00002\" />\n      <option name=\"project\" value=\"LOCAL\" />\n      <updated>1746594627366</updated>\n    </task>\n    <option name=\"localTasksCounter\" value=\"3\" />\n    <servers />\n  </component>\n  <component name=\"TypeScriptGeneratedFilesManager\">\n    <option name=\"version\" value=\"3\" />\n  </component>\n  <component name=\"VcsManagerConfiguration\">\n    <MESSAGE value=\"first commit\" />\n    <MESSAGE value=\"add files\" />\n    <option name=\"LAST_COMMIT_MESSAGE\" value=\"add files\" />\n  </component>\n</project>
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/.idea/workspace.xml b/.idea/workspace.xml
+--- a/.idea/workspace.xml	(revision d7c2adc8b7da7033a03f6ddbc966fd7c5fabba96)
++++ b/.idea/workspace.xml	(date 1746623431114)
+@@ -20,28 +20,59 @@
+   &quot;associatedIndex&quot;: 6
+ }</component>
+   <component name="ProjectId" id="2wkopb3UvNhWtBaHSPNK1RAEXKa" />
+-  <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
+   <component name="ProjectViewState">
+     <option name="hideEmptyMiddlePackages" value="true" />
+     <option name="showLibraryContents" value="true" />
+   </component>
+-  <component name="PropertiesComponent">{
+-  &quot;keyToString&quot;: {
+-    &quot;Maven. [org.apache.maven.plugins:maven-archetype-plugin:RELEASE:generate].executor&quot;: &quot;Run&quot;,
+-    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
+-    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+-    &quot;git-widget-placeholder&quot;: &quot;master&quot;,
+-    &quot;kotlin-language-version-configured&quot;: &quot;true&quot;,
+-    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+-    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
++  <component name="PropertiesComponent"><![CDATA[{
++  "keyToString": {
++    "Application.ClienteAhorcado.executor": "Run",
++    "Maven. [org.apache.maven.plugins:maven-archetype-plugin:RELEASE:generate].executor": "Run",
++    "RunOnceActivity.OpenProjectViewOnStart": "true",
++    "RunOnceActivity.ShowReadmeOnStart": "true",
++    "kotlin-language-version-configured": "true",
++    "node.js.selected.package.tslint": "(autodetect)",
++    "nodejs_package_manager_path": "npm",
++    "vue.rearranger.settings.migration": "true"
+   }
+-}</component>
++}]]></component>
+   <component name="RecentsManager">
++    <key name="CopyFile.RECENT_KEYS">
++      <recent name="$PROJECT_DIR$/src/main/java/org/example/servidor" />
++    </key>
+     <key name="MoveFile.RECENT_KEYS">
+       <recent name="D:\Usuarios\david\Documentos\CETI\Actividades\Quinto\computacionParalela\ahorcado\ahorcado\src\main\java\org\example\servidor" />
+       <recent name="D:\Usuarios\david\Documentos\CETI\Actividades\Quinto\computacionParalela\ahorcado\ahorcado\src\main\java\org\example\cliente" />
+     </key>
+   </component>
++  <component name="RunManager">
++    <configuration name="ClienteAhorcado" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
++      <option name="MAIN_CLASS_NAME" value="org.example.cliente.ClienteAhorcado" />
++      <module name="ahorcado" />
++      <extension name="coverage">
++        <pattern>
++          <option name="PATTERN" value="org.example.cliente.*" />
++          <option name="ENABLED" value="true" />
++        </pattern>
++      </extension>
++      <method v="2">
++        <option name="Make" enabled="true" />
++      </method>
++    </configuration>
++    <recent_temporary>
++      <list>
++        <item itemvalue="Application.ClienteAhorcado" />
++      </list>
++    </recent_temporary>
++  </component>
++  <component name="SharedIndexes">
++    <attachedChunks>
++      <set>
++        <option value="bundled-jdk-9823dce3aa75-fbdcb00ec9e3-intellij.indexing.shared.core-IU-251.23774.435" />
++        <option value="bundled-js-predefined-d6986cc7102b-f27c65a3e318-JavaScript-IU-251.23774.435" />
++      </set>
++    </attachedChunks>
++  </component>
+   <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
+   <component name="TaskManager">
+     <task active="true" id="Default" summary="Default task">
+@@ -53,6 +84,7 @@
+       <workItem from="1746594426858" duration="246000" />
+       <workItem from="1746595117130" duration="41000" />
+       <workItem from="1746595168412" duration="31000" />
++      <workItem from="1746623091576" duration="374000" />
+     </task>
+     <task id="LOCAL-00001" summary="first commit">
+       <option name="closed" value="true" />

@@ -17,8 +17,12 @@ public class JuegoAhorcado {
         this.errores = 0;
     }
 
-    public boolean intentar(char letra) {
+    public synchronized boolean intentar(char letra) {
         letra = Character.toUpperCase(letra);
+
+        if (letrasAdivinadas.contains(letra)) {
+            return true; // ya fue adivinada
+        }
 
         if (!palabra.contains(String.valueOf(letra))) {
             errores++;
@@ -29,7 +33,7 @@ public class JuegoAhorcado {
         return true;
     }
 
-    public String getEstadoPalabra() {
+    public synchronized String getEstadoPalabra() {
         StringBuilder estado = new StringBuilder();
         for (char c : palabra.toCharArray()) {
             if (letrasAdivinadas.contains(c)) {
@@ -41,11 +45,11 @@ public class JuegoAhorcado {
         return estado.toString().trim();
     }
 
-    public int getErroresRestantes() {
+    public synchronized int getErroresRestantes() {
         return 5 - errores;
     }
 
-    public boolean estaGanado() {
+    public synchronized boolean estaGanado() {
         for (char c : palabra.toCharArray()) {
             if (!letrasAdivinadas.contains(c)) {
                 return false;
@@ -54,11 +58,11 @@ public class JuegoAhorcado {
         return true;
     }
 
-    public boolean estaPerdido() {
+    public synchronized boolean estaPerdido() {
         return errores >= 5;
     }
 
-    public String getPalabra() {
+    public synchronized String getPalabra() {
         return palabra;
     }
 }
